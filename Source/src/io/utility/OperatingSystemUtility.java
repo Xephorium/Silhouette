@@ -1,7 +1,6 @@
 package io.utility;
 
-/* Halo 2A Sound Restoration                 Chris Cruzen
- * OperatingSystemUtility                      03.10.2023
+/* OperatingSystemUtility              Christopher Cruzen
  *
  * OperatingSystemUtility provides convenience methods to
  * identify the OS of the current system.
