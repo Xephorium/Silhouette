@@ -158,7 +158,7 @@ public class EdgeDetectorOne {
                 boolean doesBackslashEdgeSeparateColors = false;
                 variation = new Color(input.getRGB(x + (edgeRadius - 1), y + (edgeRadius - 1))).getRed()
                         - new Color(input.getRGB(x - (edgeRadius - 1), y - (edgeRadius - 1))).getRed();
-                if (Math.abs(variation) > minEdgeColorDifference) {
+                if (Math.abs(variation) > minDiagColorDifference) {
                     doesBackslashEdgeSeparateColors = true;
                 }
 
