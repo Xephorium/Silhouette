@@ -9,12 +9,12 @@ public class EdgeDetectorOne {
     /*--- Variable Declarations ---*/
 
     private static final int edgeRadius = 2;
-    private static final int sideLength = 4;
+    private static final int sideLength = 3;
 
     private static final int totalScanDistance = edgeRadius + sideLength;
 
-    private static final int maxSidePixelVariation = 5; // 256 * .025
-    private static final int minEdgeColorDifference = 13; // 256 * .05
+    private static final int maxSidePixelVariation = 4; // 256 * .025
+    private static final int minEdgeColorDifference = 14; // 256 * .05
 
 
     /*--- Detection Method ---*/
