@@ -9,13 +9,13 @@ public class EdgeDetectorOne {
     /*--- Variable Declarations ---*/
 
     private static final int edgeRadius = 2;
-    private static final int sideLength = 10;
+    private static final int sideLength = 8;
 
     private static final int totalScanDistance = edgeRadius + sideLength;
 
     private static final int maxSidePixelVariation = 10;
     private static final int maxDiagPixelVariation = 3;
-    private static final int minEdgeColorDifference = 6;
+    private static final int minSideColorDifference = 4;
     private static final int minDiagColorDifference = 30;
 
 
@@ -54,7 +54,7 @@ public class EdgeDetectorOne {
                 // Check Vertical Edge Color Difference
                 boolean doesVerticalEdgeSeparateColors = false;
                 int variation = new Color(input.getRGB(x, y - edgeRadius)).getRed() - new Color(input.getRGB(x, y + edgeRadius)).getRed();
-                if (Math.abs(variation) > minEdgeColorDifference) {
+                if (Math.abs(variation) > minSideColorDifference) {
                     doesVerticalEdgeSeparateColors = true;
                 }
 
@@ -84,7 +84,7 @@ public class EdgeDetectorOne {
                 // Check Horizontal Edge Color Difference
                 boolean doesHorizontalEdgeSeparateColors = false;
                 variation = new Color(input.getRGB(x - edgeRadius, y)).getRed() - new Color(input.getRGB(x + edgeRadius, y)).getRed();
-                if (Math.abs(variation) > minEdgeColorDifference) {
+                if (Math.abs(variation) > minSideColorDifference) {
                     doesHorizontalEdgeSeparateColors = true;
                 }
 
