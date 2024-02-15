@@ -13,8 +13,10 @@ public class EdgeDetectorOne {
 
     private static final int totalScanDistance = edgeRadius + sideLength;
 
-    private static final int maxSidePixelVariation = 10; // 256 * .025
-    private static final int minEdgeColorDifference = 6; // 256 * .05
+    private static final int maxSidePixelVariation = 10;
+    private static final int maxDiagPixelVariation = 3;
+    private static final int minEdgeColorDifference = 6;
+    private static final int minDiagColorDifference = 30;
 
 
     /*--- Detection Method ---*/
@@ -89,36 +91,73 @@ public class EdgeDetectorOne {
                 boolean isHorizontalEdge = isLeftSideContinuous && isRightSideContinuous && doesHorizontalEdgeSeparateColors;
 
 
-                /*--- Backslash Edge Check ---*/
+                /*--- Forwardslash Edge Check ---*/
 
-                // Check Backslash Bottom Continuity
-                boolean isBackslashBottomSideContinuous = true;
-                for (int xOffset = 0 - edgeRadius - 1; xOffset > 0 - totalScanDistance; xOffset--) {
-                    int xCoord = x + xOffset;
-                    int yCoord = y + (Math.abs(xOffset) - 1);
-                    variation = new Color(input.getRGB(xCoord, yCoord)).getRed()
-                            - new Color(input.getRGB(xCoord - 1, yCoord + 1)).getRed();
-                    if (Math.abs(variation) > maxSidePixelVariation) {
-                        isBackslashBottomSideContinuous = false;
+                boolean isForwardslashBottomSideContinuous = true;
+                boolean isForwardslashTopSideContinuous = true;
+
+                for (int offset = edgeRadius; offset < totalScanDistance - 1; offset++) {
+                    int xDownCoord = x - offset;
+                    int yDownCoord = y + offset;
+                    int xUpCoord = x + offset;
+                    int yUpCoord = y - offset;
+
+                    // Check Bottom Left
+                    variation = new Color(input.getRGB(xDownCoord, yDownCoord)).getRed()
+                            - new Color(input.getRGB(xDownCoord - 1, yDownCoord + 1)).getRed();
+                    if (Math.abs(variation) > maxDiagPixelVariation) {
+                        isForwardslashBottomSideContinuous = false;
+                    }
+
+                    // Check Top Right
+                    variation = new Color(input.getRGB(xUpCoord, yUpCoord)).getRed()
+                            - new Color(input.getRGB(xUpCoord + 1, yUpCoord - 1)).getRed();
+                    if (Math.abs(variation) > maxDiagPixelVariation) {
+                        isForwardslashTopSideContinuous = false;
                     }
                 }
 
-                // Check Backslash Top Continuity
+                // Check Forwardslash Edge Color Difference
+                boolean doesForwardslashEdgeSeparateColors = false;
+                variation = new Color(input.getRGB(x - (edgeRadius - 1), y + (edgeRadius - 1))).getRed()
+                        - new Color(input.getRGB(x + (edgeRadius - 1), y - (edgeRadius - 1))).getRed();
+                if (Math.abs(variation) > minDiagColorDifference) {
+                    doesForwardslashEdgeSeparateColors = true;
+                }
+
+                boolean isForwardslashEdge = isForwardslashTopSideContinuous && isForwardslashBottomSideContinuous && doesForwardslashEdgeSeparateColors;
+
+
+                /*--- Backslash Edge Check ---*/
+
+                boolean isBackslashBottomSideContinuous = true;
                 boolean isBackslashTopSideContinuous = true;
-                for (int xOffset = edgeRadius; xOffset < totalScanDistance - 1; xOffset++) {
-                    int xCoord = x + xOffset;
-                    int yCoord = y - (Math.abs(xOffset) + 1);
-                    variation = new Color(input.getRGB(xCoord, yCoord)).getRed()
-                            - new Color(input.getRGB(xCoord + 1, yCoord - 1)).getRed();
-                    if (Math.abs(variation) > maxSidePixelVariation) {
+
+                for (int offset = edgeRadius; offset < totalScanDistance - 1; offset++) {
+                    int xDownCoord = x + offset;
+                    int yDownCoord = y + offset;
+                    int xUpCoord = x - offset;
+                    int yUpCoord = y - offset;
+
+                    // Check Bottom Right
+                    variation = new Color(input.getRGB(xDownCoord, yDownCoord)).getRed()
+                            - new Color(input.getRGB(xDownCoord + 1, yDownCoord + 1)).getRed();
+                    if (Math.abs(variation) > maxDiagPixelVariation) {
+                        isBackslashBottomSideContinuous = false;
+                    }
+
+                    // Check Top Left
+                    variation = new Color(input.getRGB(xUpCoord, yUpCoord)).getRed()
+                            - new Color(input.getRGB(xUpCoord - 1, yUpCoord - 1)).getRed();
+                    if (Math.abs(variation) > maxDiagPixelVariation) {
                         isBackslashTopSideContinuous = false;
                     }
                 }
 
                 // Check Backslash Edge Color Difference
                 boolean doesBackslashEdgeSeparateColors = false;
-                variation = new Color(input.getRGB(x - edgeRadius, y + (edgeRadius - 1))).getRed()
-                        - new Color(input.getRGB(x - (edgeRadius - 1), y + edgeRadius)).getRed();
+                variation = new Color(input.getRGB(x + (edgeRadius - 1), y + (edgeRadius - 1))).getRed()
+                        - new Color(input.getRGB(x - (edgeRadius - 1), y - (edgeRadius - 1))).getRed();
                 if (Math.abs(variation) > minEdgeColorDifference) {
                     doesBackslashEdgeSeparateColors = true;
                 }
@@ -126,13 +165,11 @@ public class EdgeDetectorOne {
                 boolean isBackslashEdge = isBackslashTopSideContinuous && isBackslashBottomSideContinuous && doesBackslashEdgeSeparateColors;
 
 
-                // Write Color
-                if (isVerticalEdge || isHorizontalEdge) {
-                    output.setRGB(x, y, new Color(255, 255, 255).getRGB());
-                }
+                /*--- Final Color Write ---*/
 
-                if (isBackslashEdge) {
-                    output.setRGB(x - 2, y + 1, new Color(255, 255, 255).getRGB());
+                // Write Color
+                if (isVerticalEdge || isHorizontalEdge || isForwardslashEdge || isBackslashEdge) {
+                    output.setRGB(x, y, new Color(255, 255, 255).getRGB());
                 }
             }
         }
