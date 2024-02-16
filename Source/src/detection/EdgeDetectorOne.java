@@ -9,12 +9,13 @@ public class EdgeDetectorOne {
     /*--- Variable Declarations ---*/
 
     private static final int edgeRadius = 2;
-    private static final int sideLength = 8;
+    private static final int sideLength = 4;
 
     private static final int totalScanDistance = edgeRadius + sideLength;
 
     private static final int maxSidePixelVariation = 10;
-    private static final int maxDiagPixelVariation = 3;
+    private static final int maxDiagPixelVariation = 7;
+    private static final int maxSideOverallVariation = 3;
     private static final int minSideColorDifference = 4;
     private static final int minDiagColorDifference = 30;
 
@@ -42,6 +43,13 @@ public class EdgeDetectorOne {
                     }
                 }
 
+                // Check Top Overall Change
+                boolean isTopSideUnchanging = true;
+                int diff = new Color(input.getRGB(x, y - totalScanDistance)).getRed() - new Color(input.getRGB(x, y - edgeRadius - 1)).getRed();
+                if (Math.abs(diff) > maxSideOverallVariation) {
+                    isTopSideUnchanging = false;
+                }
+
                 // Check Bottom Continuity
                 boolean isBottomSideContinuous = true;
                 for (int yTest = y + edgeRadius; yTest < y + (totalScanDistance - 1); yTest++) {
@@ -51,6 +59,13 @@ public class EdgeDetectorOne {
                     }
                 }
 
+                // Check Bottom Overall Change
+                boolean isBottomSideUnchanging = true;
+                diff = new Color(input.getRGB(x, y + edgeRadius + 1)).getRed() - new Color(input.getRGB(x, y + totalScanDistance)).getRed();
+                if (Math.abs(diff) > maxSideOverallVariation) {
+                    isBottomSideUnchanging = false;
+                }
+
                 // Check Vertical Edge Color Difference
                 boolean doesVerticalEdgeSeparateColors = false;
                 int variation = new Color(input.getRGB(x, y - edgeRadius)).getRed() - new Color(input.getRGB(x, y + edgeRadius)).getRed();
@@ -58,7 +73,9 @@ public class EdgeDetectorOne {
                     doesVerticalEdgeSeparateColors = true;
                 }
 
-                boolean isVerticalEdge = isTopSideContinuous && isBottomSideContinuous && doesVerticalEdgeSeparateColors;
+                boolean isVerticalEdge = isTopSideContinuous && isTopSideUnchanging &&
+                                isBottomSideContinuous && isBottomSideUnchanging &&
+                                doesVerticalEdgeSeparateColors;
 
 
                 /*--- Horizontal Edge Check ---*/
@@ -72,6 +89,13 @@ public class EdgeDetectorOne {
                     }
                 }
 
+                // Check Left Overall Change
+                boolean isLeftSideUnchanging = true;
+                diff = new Color(input.getRGB(x - totalScanDistance, y)).getRed() - new Color(input.getRGB(x - (edgeRadius - 1), y)).getRed();
+                if (Math.abs(diff) > maxSideOverallVariation) {
+                    isLeftSideUnchanging = false;
+                }
+
                 // Check Right Continuity
                 boolean isRightSideContinuous = true;
                 for (int xTest = x + edgeRadius; xTest < x + (totalScanDistance - 1); xTest++) {
@@ -81,6 +105,13 @@ public class EdgeDetectorOne {
                     }
                 }
 
+                // Check Right Overall Change
+                boolean isRightSideUnchanging = true;
+                diff = new Color(input.getRGB(x + edgeRadius + 1, y)).getRed() - new Color(input.getRGB(x + totalScanDistance, y)).getRed();
+                if (Math.abs(diff) > maxSideOverallVariation) {
+                    isRightSideUnchanging = false;
+                }
+
                 // Check Horizontal Edge Color Difference
                 boolean doesHorizontalEdgeSeparateColors = false;
                 variation = new Color(input.getRGB(x - edgeRadius, y)).getRed() - new Color(input.getRGB(x + edgeRadius, y)).getRed();
@@ -88,7 +119,9 @@ public class EdgeDetectorOne {
                     doesHorizontalEdgeSeparateColors = true;
                 }
 
-                boolean isHorizontalEdge = isLeftSideContinuous && isRightSideContinuous && doesHorizontalEdgeSeparateColors;
+                boolean isHorizontalEdge = isLeftSideContinuous && isLeftSideUnchanging &&
+                        isRightSideContinuous && isRightSideUnchanging &&
+                        doesHorizontalEdgeSeparateColors;
 
 
                 /*--- Forwardslash Edge Check ---*/
